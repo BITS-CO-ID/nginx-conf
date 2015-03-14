@@ -1,0 +1,102 @@
+server {
+        listen 128.199.122.79:80;
+
+
+        server_name pedallink.com www.pedallink.com ;
+        root   /home/www/pedallink.com/web;
+
+
+        index index.html index.htm index.php index.cgi index.pl index.xhtml;
+
+
+        location / {
+        try_files $uri $uri/ /index.php?$args;
+        }
+
+rewrite /wp-admin$ $scheme://$host$uri/ permanent;
+
+        location ~* ^.+\.(ogg|ogv|svg|svgz|eot|otf|woff|mp4|ttf|rss|atom|jpg|jpeg|gif|png|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf)$ {
+       access_log off; log_not_found off; expires max;
+        }
+
+
+        error_page 400 /error/400.html;
+        error_page 401 /error/401.html;
+        error_page 403 /error/403.html;
+        error_page 404 /error/404.html;
+        error_page 405 /error/405.html;
+        error_page 500 /error/500.html;
+        error_page 502 /error/502.html;
+        error_page 503 /error/503.html;
+        recursive_error_pages on;
+        location = /error/400.html {
+
+            internal;
+        }
+        location = /error/401.html {
+
+            internal;
+        }
+        location = /error/403.html {
+
+            internal;
+        }
+        location = /error/404.html {
+
+            internal;
+        }
+        location = /error/405.html {
+
+            internal;
+        }
+        location = /error/500.html {
+
+            internal;
+        }
+        location = /error/502.html {
+
+            internal;
+        }
+        location = /error/503.html {
+
+            internal;
+        }
+
+
+        location ~ /\. {
+            deny all;
+            access_log off;
+            log_not_found off;
+        }
+
+        location = /favicon.ico {
+            log_not_found off;
+            access_log off;
+        }
+
+        location = /robots.txt {
+            allow all;
+            log_not_found off;
+            access_log off;
+        }
+
+        location ~ \.php$ {
+            try_files /a3640b431e16397db6f949b8a08b3d18.htm @php;
+        }
+
+        location @php {
+            try_files $uri =404;
+            include /etc/nginx/fastcgi_params;
+            fastcgi_pass unix:/var/lib/php5-fpm/web18.sock;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_intercept_errors on;
+        }
+
+
+
+
+
+
+
+}

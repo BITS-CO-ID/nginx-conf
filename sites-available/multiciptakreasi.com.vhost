@@ -1,0 +1,48 @@
+server {
+        listen 128.199.122.79:80;
+        server_name multiciptakreasi.com www.multiciptakreasi.com;
+        root   /home/www/multiciptakreasi.com/web;
+        index index.html index.htm index.php index.cgi index.pl index.xhtml;
+
+# WordPress single blog rules.
+# Designed to be included in any server {} block.
+
+# This order might seem weird - this is attempted to match last if rules below $
+# http://wiki.nginx.org/HttpCoreModule
+location / {
+        try_files $uri $uri/ /index.php?$args;
+}
+
+# Add trailing slash to */wp-admin requests.
+rewrite /wp-admin$ $scheme://$host$uri/ permanent;
+
+#        error_log /var/log/ispconfig/httpd/multiciptakreasi.com/error.log;
+#        access_log /var/log/ispconfig/httpd/multiciptakreasi.com/access.log combined;
+
+        location ~ /\. {
+            deny all;
+            access_log off;
+            log_not_found off;
+        }
+
+        location = /favicon.ico {
+            log_not_found off;
+            access_log off;
+        }
+
+        location = /robots.txt {
+            allow all;
+            log_not_found off;
+            access_log off;
+        }
+
+        location ~ \.php$ {
+            try_files $uri =404;
+            include /etc/nginx/fastcgi_params;
+            fastcgi_pass unix:/var/lib/php5-fpm/web10.sock;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_intercept_errors on;
+        }
+
+}

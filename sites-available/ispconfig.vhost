@@ -1,0 +1,46 @@
+server {
+        listen 7777 spdy;
+	ssl on;
+	ssl_protocols TLSv1 TLSv1.1 TLSv1.2;
+	ssl_certificate /home/www/bits.co.id/ssl/bits.co.id.crt;
+	ssl_certificate_key /home/www/bits.co.id/ssl/bits.co.id.key;		
+
+        include /etc/nginx/h5bp/directive-only/ssl.conf;
+        include /etc/nginx/h5bp/directive-only/ssl-stapling.conf;
+        include /etc/nginx/h5bp/directive-only/spdy.conf;
+        include /etc/nginx/h5bp/directive-only/extra-security.conf;
+
+	error_page 497 https://$host:7777$request_uri;
+
+        server_name _;
+        root   /usr/local/ispconfig/interface/web/;
+        client_max_body_size 20M;
+
+        location / {
+               index index.php index.html;
+        }
+
+        # serve static files directly
+        location ~* ^.+.(jpg|jpeg|gif|css|png|js|ico|html|xml|txt)$ {
+        	access_log        off;
+		log_not_found     off;
+		expires           360d;
+        }
+
+        location ~ \.php$ {
+               try_files $uri =404;
+               include /etc/nginx/fastcgi_params;
+               fastcgi_pass unix:/var/lib/php5-fpm/ispconfig.sock;
+               fastcgi_index index.php;
+               fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+               #fastcgi_param PATH_INFO $fastcgi_script_name;
+               fastcgi_buffer_size 128k;
+               fastcgi_buffers 256 4k;
+               fastcgi_busy_buffers_size 256k;
+               fastcgi_temp_file_write_size 256k;
+        }
+
+        location ~ /\. {
+               deny  all;
+        }
+}

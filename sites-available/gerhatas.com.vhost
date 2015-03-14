@@ -1,0 +1,122 @@
+server {
+        listen 128.199.122.79:80;
+
+
+        server_name gerhatas.com www.gerhatas.com;
+
+        root   /home/www/gerhatas.com/web;
+
+
+
+        index index.html index.htm index.php index.cgi index.pl index.xhtml;
+
+# WordPress single blog rules.
+# Designed to be included in any server {} block.
+
+# This order might seem weird - this is attempted to match last if rules below fail.
+# http://wiki.nginx.org/HttpCoreModule
+location / {
+	try_files $uri $uri/ /index.php?$args;
+}
+
+# Add trailing slash to */wp-admin requests.
+rewrite /wp-admin$ $scheme://$host$uri/ permanent;
+
+# Directives to send expires headers and turn off 404 error logging.
+location ~* ^.+\.(ogg|ogv|svg|svgz|eot|otf|woff|mp4|ttf|rss|atom|jpg|jpeg|gif|png|ico|zip|tgz|gz|rar|bz2|doc|xls|exe|ppt|tar|mid|midi|wav|bmp|rtf)$ {
+       access_log off; log_not_found off; expires max;
+}
+
+        error_page 400 /error/400.html;
+        error_page 401 /error/401.html;
+        error_page 403 /error/403.html;
+        error_page 404 /error/404.html;
+        error_page 405 /error/405.html;
+        error_page 500 /error/500.html;
+        error_page 502 /error/502.html;
+        error_page 503 /error/503.html;
+        recursive_error_pages on;
+        location = /error/400.html {
+
+            internal;
+        }
+        location = /error/401.html {
+
+            internal;
+        }
+        location = /error/403.html {
+
+            internal;
+        }
+        location = /error/404.html {
+
+            internal;
+        }
+        location = /error/405.html {
+
+            internal;
+        }
+        location = /error/500.html {
+
+            internal;
+        }
+        location = /error/502.html {
+
+            internal;
+        }
+        location = /error/503.html {
+
+            internal;
+        }
+
+        error_log /var/log/ispconfig/httpd/gerhatas.com/error.log;
+        access_log /var/log/ispconfig/httpd/gerhatas.com/access.log combined;
+
+        location ~ /\. {
+            deny all;
+            access_log off;
+            log_not_found off;
+        }
+
+        location = /favicon.ico {
+            log_not_found off;
+            access_log off;
+        }
+
+        location = /robots.txt {
+            allow all;
+            log_not_found off;
+            access_log off;
+        }
+
+        location /stats/ {
+
+            index index.html index.php;
+            auth_basic "Members Only";
+            auth_basic_user_file /home/www/clients/client9/web8/web/stats/.htpasswd_stats;
+        }
+
+        location ^~ /awstats-icon {
+            alias /usr/share/awstats/icon;
+        }
+
+        location ~ \.php$ {
+            try_files /f324fd08a3cb549f807102ebfb632417.htm @php;
+        }
+
+        location @php {
+            try_files $uri =404;
+            include /etc/nginx/fastcgi_params;
+            fastcgi_pass unix:/var/lib/php5-fpm/web8.sock;
+            fastcgi_index index.php;
+            fastcgi_param SCRIPT_FILENAME $document_root$fastcgi_script_name;
+            fastcgi_intercept_errors on;
+        }
+
+
+
+
+
+
+
+}
